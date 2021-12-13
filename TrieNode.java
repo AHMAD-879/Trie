@@ -1,8 +1,6 @@
-import java.util.ArrayList;
-
 public class TrieNode<T> {
     private String letter;  // the letter carried by the node
-    private ArrayList<TrieNode<String>> nextNodesPointer; // an ArrayList of pointers to child nodes
+    private TrieNode[] childNodes; // an array of pointers to child nodes
     protected boolean isEndOfWord; // true if a word ends on the current node
 
     public TrieNode() {
@@ -10,31 +8,38 @@ public class TrieNode<T> {
     }
     public TrieNode(String letter) {
         this.letter = letter;
-        nextNodesPointer = new ArrayList<TrieNode<String>>();
+        childNodes = new TrieNode[26]; // an empty array for child nodes of size 26 (A-Z)
         isEndOfWord = false;
     }
 
     public String getLetter() {
         return this.letter;
     }
-    public ArrayList<TrieNode<String>> getChildren() {
-        return this.nextNodesPointer;
+    public TrieNode[] getChildren() {
+        return this.childNodes;
     }
 
     // Checks if a TrieNode containing a specific letter is a child of this node
-    public TrieNode<String> isChild(String s) {
-        if (this.nextNodesPointer.isEmpty()) // if this node has no child nodes
+    public TrieNode<String> getChild(String s) {
+        if (this.childNodes.length == 0) // if this node has no child nodes
             return null;
-        for (TrieNode child : nextNodesPointer) // loop over each child node
-            if (child.letter.equals(s))
-                return child;
-        return null;  // if no child node has the specified letter
+        int hashIndex = getHash(s); // the hash index for the childNodes array
+        TrieNode child = this.getChildren()[hashIndex]; // get the child node carrying the letter
+        return child;  // return the child node; if it is null, the method returns null
     }
 
+    // Adds a new child node to the current node
     public TrieNode<String> addChild(String s) {
-        TrieNode<String> newChild = new TrieNode<>(s);
-        nextNodesPointer.add(newChild);
+        TrieNode<String> newChild = new TrieNode<>(s); // create a new TrieNode with the specified letter
+        int hashIndex = getHash(s); // the hash index for the childNodes array
+        childNodes[hashIndex] = newChild; // set the childNode at the specified index to the new TrieNode
         return newChild;
+    }
+
+    // Returns the hash index for a letter in the childNodes array
+    public int getHash(String s) {
+        char letter = s.toUpperCase().charAt(0);
+        return letter - 'A';
     }
 
 
